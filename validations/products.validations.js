@@ -5,6 +5,7 @@ const validatePurchases = data => {
     id: Joi.string().required(),
     purchaseValue: Joi.number().required(),
     amount: Joi.number().required(),
+    name: Joi.string().required(),
   });
 
   return purchaseSchema.validate(data);
