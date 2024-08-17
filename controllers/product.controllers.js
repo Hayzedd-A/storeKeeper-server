@@ -4,8 +4,13 @@ const {
   updateProductQuantityByID,
   updatePurchasedProducts,
   createPurchaseHistory,
+  getHistoryFromDB,
+  updateProductToDB,
 } = require("../models/products.models");
-const { validatePurchases } = require("../validations/products.validations");
+const {
+  validatePurchases,
+  validateProductUpdate,
+} = require("../validations/products.validations");
 const { v4: uuidv4 } = require("uuid");
 
 const getAllProducts = async (req, res) => {
@@ -107,7 +112,7 @@ const purchaseProducts = async (req, res) => {
       total_amount,
       seller_id = "c3ed702a-913c-4e3f-81c6-5e2d6afe1f80",
     } = req.body;
-    console.log("items : ", items);
+    // console.log("items : ", items);
     const validatedProducts = [];
     // Validate each product in the items array
     await Promise.all(
@@ -135,13 +140,13 @@ const purchaseProducts = async (req, res) => {
         // create an array of the products having the new quantity
         product.newQuantity = availableQuantity;
         validatedProducts.push(product);
-        console.log("validated: ", validatedProducts);
+        // console.log("validated: ", validatedProducts);
       })
     );
 
     // update all products quantity in the database
     const [updateResult] = await updatePurchasedProducts(validatedProducts);
-    console.log("quantity update: ", updateResult);
+    // console.log("quantity update: ", updateResult);
     // console.log("validated Products: ", validatedProducts);
     if (updateResult.affectedRows === 0 || updateResult instanceof Error) {
       throw new Error("database, Failed to update product quantities");
@@ -158,7 +163,7 @@ const purchaseProducts = async (req, res) => {
     };
     // insert the history into the database
     const [historyResult] = await createPurchaseHistory(historyData);
-    console.log("history update: ", historyResult);
+    // console.log("history update: ", historyResult);
     // console.log(typeof historyResult);
     if (historyResult.affectedRows === 0 || historyResult instanceof Error) {
       throw new Error("Failed to create history entries");
@@ -170,11 +175,66 @@ const purchaseProducts = async (req, res) => {
     });
   } catch (err) {
     console.error(err.stack);
-    res.status(400).json({
+    res.status(403).json({
       status: false,
       message: err.message,
     });
   }
 };
 
-module.exports = { getAllProducts, purchaseProducts };
+const getHisotory = async (req, res) => {
+  try {
+    const seller_id = req.params.id;
+    const [historyData] = await getHistoryFromDB(seller_id);
+
+    if (!historyData || !historyData.length) {
+      throw new Error("No history found with that id");
+    }
+    if (historyData instanceof Error) {
+      console.log(historyData);
+      throw new Error("There was an error fectching data");
+    }
+
+    res.status(200).json({
+      status: true,
+      data: historyData,
+    });
+  } catch (error) {
+    console.error(error.stack);
+    res.status(400).json({
+      status: false,
+      message: error.message,
+    });
+  }
+};
+
+const updateProduct = async (req, res) => {
+  try {
+    const { error } = validateProductUpdate(req.body);
+    if (error) {
+      throw new Error(error.details[0].message);
+    }
+    const [updateResult] = await updateProductToDB(req.body);
+    if (updateResult.affectedRows === 0 || updateResult instanceof Error) {
+      throw new Error("Failed to update product");
+    }
+    console.log(updateResult);
+    res.status(200).json({
+      status: true,
+      message: "Product updated successfully",
+    });
+  } catch (error) {
+    console.error(error.stack);
+    res.status(400).json({
+      status: false,
+      message: error.message,
+    });
+  }
+};
+
+module.exports = {
+  getAllProducts,
+  purchaseProducts,
+  getHisotory,
+  updateProduct,
+};

@@ -1,5 +1,5 @@
 use storeDB;
-/* SELECT * FROM products; */
+SELECT * FROM products;
 /* ALTER TABLE products
 ADD COLUMN category VARCHAR(100) DEFAULT 'General'; */
 /* ALTER TABLE products
@@ -38,9 +38,9 @@ CREATE TABLE users (
 /* SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY','')); */
 
 /* SELECT * FROM users; */
-SELECT * FROM history ;
-/* ALTER TABLE history ADD COLUMN sale_id varchar(200) NOT NULL;
-DESC history; */
+/* SELECT * FROM history ; */
+/* ALTER TABLE history ADD COLUMN sale_date datetime DEFAULT CURRENT_TIMESTAMP NOT NULL; */
+/* DESC history; */
 
 /* SELECT 
     h.sale_id,
@@ -67,3 +67,45 @@ WHERE
     seller_id = 'c3ed702a-913c-4e3f-81c6-5e2d6afe1f80'
 GROUP BY 
     sale_id; */
+
+/* SELECT 
+    seller_id,
+    sale_id,
+    created_at,
+    JSON_ARRAYAGG(JSON_OBJECT('product_id', product_id, 'quantity', quantity, 'amount', amount)) AS products
+FROM 
+    history
+WHERE
+    seller_id = 'c3ed702a-913c-4e3f-81c6-5e2d6afe1f80'
+GROUP BY 
+    sale_id
+ORDER BY 
+    created_at;  */
+
+
+/* SELECT 
+    h.sale_id,
+    JSON_ARRAYAGG(
+        JSON_OBJECT(
+            'product_id', h.product_id,
+            'quantity', h.quantity,
+            'amount', h.amount,
+            'name', p.name,
+            'image', p.image
+        )
+    ) AS products
+FROM 
+    history h
+JOIN 
+    products p ON h.product_id = p.id
+WHERE
+    h.seller_id = 'c3ed702a-913c-4e3f-81c6-5e2d6afe1f80'
+GROUP BY 
+    h.sale_id
+ORDER BY 
+    h.created_at DESC; */
+
+SELECT @@global.time_zone, @@session.time_zone;
+
+/* SET GLOBAL time_zone = '+01:00';
+SET time_zone = '+01:00'; */

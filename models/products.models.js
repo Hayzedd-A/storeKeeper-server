@@ -82,10 +82,61 @@ const createPurchaseHistory = async data => {
   }
 };
 
+const getHistoryFromDB = async seller_id => {
+  try {
+    const query = `SELECT 
+    h.sale_id,
+    created_at,
+    JSON_ARRAYAGG(
+        JSON_OBJECT(
+            'product_id', h.product_id,
+            'quantity', h.quantity,
+            'amount', h.amount,
+            'name', p.name,
+            'image', p.image
+        )
+    ) AS products,
+     SUM (h.amount) as total_amount
+FROM 
+    history h
+JOIN 
+    products p ON h.product_id = p.id
+WHERE
+    h.seller_id = 'c3ed702a-913c-4e3f-81c6-5e2d6afe1f80'
+GROUP BY 
+    h.sale_id
+ORDER BY 
+    h.created_at DESC;`;
+    const db_conn = await db_con();
+    await db_conn.execute(
+      "SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))"
+    );
+    return await db_conn.execute(query);
+  } catch (error) {
+    console.log(error.stack);
+    return new Error(error.message);
+  }
+};
+
+const updateProductToDB = async data => {
+  try {
+    console.log("from model: ", data);
+    const query = `UPDATE products SET name =?, price =?, quantity =? WHERE id =?;`;
+    const values = [data.name, data.price, data.quantity, data.id];
+    console.log(values);
+    const db_conn = await db_con();
+    return await db_conn.execute(query, values);
+  } catch (error) {
+    console.log(error.stack);
+    return new Error(error.message);
+  }
+};
 module.exports = {
+  updateProductToDB,
   getAllProductsFromDB,
   getProductsByID,
   updateProductQuantityByID,
   updatePurchasedProducts,
   createPurchaseHistory,
+  getHistoryFromDB,
 };

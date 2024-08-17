@@ -11,4 +11,15 @@ const validatePurchases = data => {
   return purchaseSchema.validate(data);
 };
 
-module.exports = { validatePurchases };
+const validateProductUpdate = data => {
+  const productUpdateSchema = Joi.object({
+    id: Joi.string().required(),
+    name: Joi.string(),
+    price: Joi.number(),
+    quantity: Joi.number(),
+  });
+
+  return productUpdateSchema.validate(data);
+};
+
+module.exports = { validatePurchases, validateProductUpdate };
