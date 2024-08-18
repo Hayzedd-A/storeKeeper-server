@@ -78,6 +78,9 @@ const createPurchaseHistory = async data => {
     const db_conn = await db_con();
     return await db_conn.execute(query, values);
   } catch (error) {
+    console.log(error.message);
+    console.log(error.stack);
+    sale_date;
     return new Error(error);
   }
 };

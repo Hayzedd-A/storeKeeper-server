@@ -13,12 +13,25 @@ MODIFY COLUMN id VARCHAR(200); */
     product_id varchar(200) NOT NULL,
     quantity int NOT NULL,
     amount Decimal(10, 2) NOT NULL,
-    sale_time datetime NOT NULL,
+    sale_date datetime NOT NULL,
+    sale_id varchar(200) NOT NULL,
     seller_id varchar(200) NOT NULL,
     FOREIGN KEY (seller_id) REFERENCES users(id),
     FOREIGN KEY (product_id) REFERENCES products(id),
     created_at datetime DEFAULT CURRENT_TIMESTAMP
 ); */
+
+
+CREATE TABLE products (
+    sn int AUTO_INCREMENT UNIQUE,
+    id varchar(200) PRIMARY KEY UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    quantity int NOT NULL,
+    price DECIMAL(50, 2) NOT NULL,
+    image varchar(200),
+    category VARCHAR(100) DEFAULT 'General',
+)
 
 /* use storeDB; */
 /* DROP TABLE history; */

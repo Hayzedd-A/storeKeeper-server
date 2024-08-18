@@ -110,7 +110,7 @@ const purchaseProducts = async (req, res) => {
     const {
       items,
       total_amount,
-      seller_id = "c3ed702a-913c-4e3f-81c6-5e2d6afe1f80",
+      seller_id = "63b73cce-d15b-4a81-8379-c9229bdf4ece",
     } = req.body;
     // console.log("items : ", items);
     const validatedProducts = [];
@@ -159,11 +159,11 @@ const purchaseProducts = async (req, res) => {
       id: historyID,
       items: validatedProducts,
       seller_id: seller_id,
-      sale_time: new Date().toISOString(),
+      sale_date: new Date().toISOString(),
     };
     // insert the history into the database
     const [historyResult] = await createPurchaseHistory(historyData);
-    // console.log("history update: ", historyResult);
+    console.log("history update: ", historyResult);
     // console.log(typeof historyResult);
     if (historyResult.affectedRows === 0 || historyResult instanceof Error) {
       throw new Error("Failed to create history entries");
