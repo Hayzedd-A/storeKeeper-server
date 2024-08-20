@@ -17,6 +17,7 @@ app.use("/products", productRoutes);
 app.use("/users", userRoutes);
 
 app.listen(port, () => {
+  console.log(process.env.DB_USER);
   routemap(app);
   console.log(`Server is running on port ${port}`);
 });

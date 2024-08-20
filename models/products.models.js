@@ -89,7 +89,7 @@ const getHistoryFromDB = async seller_id => {
   try {
     const query = `SELECT 
     h.sale_id,
-    created_at,
+    MAX(h.created_at) AS created_at,
     JSON_ARRAYAGG(
         JSON_OBJECT(
             'product_id', h.product_id,
@@ -99,21 +99,20 @@ const getHistoryFromDB = async seller_id => {
             'image', p.image
         )
     ) AS products,
-     SUM (h.amount) as total_amount
+    SUM(h.amount) AS total_amount
 FROM 
     history h
 JOIN 
     products p ON h.product_id = p.id
 WHERE
-    h.seller_id = 'c3ed702a-913c-4e3f-81c6-5e2d6afe1f80'
+    h.seller_id = '63b73cce-d15b-4a81-8379-c9229bdf4ece'
 GROUP BY 
     h.sale_id
 ORDER BY 
-    h.created_at DESC;`;
+    created_at DESC;
+`;
     const db_conn = await db_con();
-    await db_conn.execute(
-      "SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))"
-    );
+
     return await db_conn.execute(query);
   } catch (error) {
     console.log(error.stack);
