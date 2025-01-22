@@ -69,10 +69,10 @@ const createPurchaseHistory = async (data) => {
     const values = data.items.map((item) => {
       return `('${uniqid.time()}','${data.id}','${item.id}',${
         item.purchaseValue
-      },${item.amount}, '${data.sale_date}','${data.seller_id}')`;
+      },${item.amount},'${data.seller_id}')`;
     });
     const query = `
-      INSERT INTO history (id, sale_id, product_id, quantity, amount, sale_date,  seller_id) 
+      INSERT INTO history (id, sale_id, product_id, quantity, amount,  seller_id) 
       VALUES ${values}
     `;
     const db_conn = await db_con();
