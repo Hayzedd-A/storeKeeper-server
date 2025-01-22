@@ -13,7 +13,7 @@ const getAllProductsFromDB = async () => {
   }
 };
 
-const getProductsByID = async id => {
+const getProductsByID = async (id) => {
   try {
     const query = `SELECT * FROM products WHERE id =?;`;
     const db_conn = await db_con();
@@ -45,7 +45,7 @@ UPDATE products SET
 WHERE id IN (1, 2, 3); 
 */
 
-const updatePurchasedProducts = async data => {
+const updatePurchasedProducts = async (data) => {
   try {
     let query = `UPDATE products SET quantity = CASE id `;
     let values = [];
@@ -64,15 +64,15 @@ const updatePurchasedProducts = async data => {
   }
 };
 
-const createPurchaseHistory = async data => {
+const createPurchaseHistory = async (data) => {
   try {
-    const values = data.items.map(item => {
+    const values = data.items.map((item) => {
       return `('${uniqid.time()}','${data.id}','${item.id}',${
         item.purchaseValue
-      },${item.amount},'${data.seller_id}')`;
+      },${item.amount}, '${item.sale_date}','${data.seller_id}')`;
     });
     const query = `
-      INSERT INTO history (id, sale_id, product_id, quantity, amount,  seller_id) 
+      INSERT INTO history (id, sale_id, product_id, quantity, amount, sale_date,  seller_id) 
       VALUES ${values}
     `;
     const db_conn = await db_con();
@@ -85,7 +85,7 @@ const createPurchaseHistory = async data => {
   }
 };
 
-const getHistoryFromDB = async seller_id => {
+const getHistoryFromDB = async (seller_id) => {
   try {
     const query = `SELECT 
     h.sale_id,
@@ -120,7 +120,7 @@ ORDER BY
   }
 };
 
-const updateProductToDB = async data => {
+const updateProductToDB = async (data) => {
   try {
     console.log("from model: ", data);
     const query = `UPDATE products SET name =?, price =?, quantity =? WHERE id =?;`;

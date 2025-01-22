@@ -30,7 +30,7 @@ const getData = async () => {
     let query = `INSERT INTO products (id, name, price, quantity, description, image, category) VALUES ?`;
     const db_conn = await databaseConnection();
 
-    let values = products.map(product => {
+    let values = products.map((product) => {
       let { title, price, stock, description, thumbnail, category } = product;
       return [
         uniqid.time(),
